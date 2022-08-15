@@ -18,7 +18,7 @@ public class Jsonworker {
         return this.students;
     }
     
-    public void get_all_Students(){
+    public String[][] get_all_Students(){
 
     }
     

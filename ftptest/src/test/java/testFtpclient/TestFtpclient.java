@@ -4,6 +4,8 @@
  */
 package testFtpclient;
 
+import com.mycompany.ftpclient.Ftpclient;
+import com.mycompany.jsonworker.Jsonworker;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.FileSystem;
@@ -27,9 +29,9 @@ import org.testng.annotations.AfterTest;
  * @author misha
  */
 public class TestFtpclient {
-
+    static FTPClient client = new FTPClient();
     static FakeFtpServer fakeFtpServer=new FakeFtpServer();
-
+    static Jsonworker worker;
     
     @BeforeTest
     public void startup() {
@@ -62,15 +64,46 @@ public class TestFtpclient {
     
     @Test
     public void connect() {
-
+        String args[] = {"localhost","misha","1111", String.valueOf(fakeFtpServer.getServerControlPort())};
+        try {
+            Ftpclient.connect(args, client);    
+            Assert.assertEquals(fakeFtpServer.getSystemStatus(),"Connected");
+        } catch (IOException ex) {
+            fail();
+        }
     }
     @Test
     public void create_worker() {
-
+        try {
+            worker = Ftpclient.createworker(client);    
+            Assert.assertEquals(worker.get_all_Students().length,3);
+        } catch (IOException ex) {
+            fail();
+        } catch (ParseException ex) {
+            fail();
+        }
     }
     @Test
     public void updateFTP()  {
-        
+                try {
+            JSONObject students = new JSONObject();
+            JSONArray arr = new JSONArray();
+            JSONObject student = new JSONObject();
+            student.put("id", 1);
+            student.put("name", "aaaa");
+            arr.add(student);
+            student = new JSONObject();
+            student.put("id", 2);
+            student.put("name", "bbbb");
+            arr.add(student);
+            students.put("students", arr);
+            Jsonworker worker2= new Jsonworker(students);
+            Ftpclient.updateFTP(client, worker2.getstudents().toString());
+            Jsonworker worker3 = Ftpclient.createworker(client);
+            Assert.assertEquals(worker3.get_all_Students().length,2);
+        } catch (IOException ex) {
+            fail();
+        }
     }
     @AfterTest
     public void tear_down(){
