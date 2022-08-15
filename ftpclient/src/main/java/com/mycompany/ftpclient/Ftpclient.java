@@ -19,15 +19,15 @@ import org.json.simple.parser.JSONParser;
 public class Ftpclient {
     public static FTPClient client = new FTPClient();
     
-    public static void main(String[] args) throws ParseException, Exception {
+    public static void main(String[] args) throws Exception {
         run(args);
     }
 
-    public static void run(String[] args) throws ParseException, Exception {    
+    public static void run(String[] args) throws Exception {    
         String[] for_ftpclient= new String[args.length+1];
         for (Integer i = 0; i< args.length;i++)
             for_ftpclient[i] = args[i];
-        for_ftpclient[for_ftpclient.length]="20";
+        for_ftpclient[for_ftpclient.length-1]="21";
         try {
             connect(for_ftpclient, client);
             Jsonworker worker = createworker(client);
@@ -90,10 +90,15 @@ public class Ftpclient {
     }
 
     public static Jsonworker createworker(FTPClient client) throws IOException, ParseException{
-                InputStream loadinputStream = client.retrieveFileStream("students.json"); 
-        JSONParser jsonParser = new JSONParser();
-        return new Jsonworker((JSONObject) jsonParser.parse(
-                        new InputStreamReader(loadinputStream, "UTF-8")));
+        Jsonworker worker;
+        try (InputStream loadinputStream = client.retrieveFileStream("students.json")) {
+            System.out.println(client.stat());
+            JSONParser jsonParser = new JSONParser();
+            worker = new Jsonworker((JSONObject) jsonParser.parse(
+                    new InputStreamReader(loadinputStream, "UTF-8")));
+        }
+        return worker;
+        
     }
     public static void print_instruction() {
         System.out.println("Print numbers in comand line according to the instruction below");
