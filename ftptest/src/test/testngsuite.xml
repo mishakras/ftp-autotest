@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+  
+<suite name="Suite1" verbose="1" >
+  <test name="Regression1">
+    <classes>
+      <class name="test.test_Jsonworker.Test_Jsonworker"/>
+        <methods>
+            <include name="getStudents_positive" />
+            <include name="addStudent_positive" />
+            <include name="addStudent_negative" />
+            <include name="getStudent_positive" />
+            <include name="getStudent_negative" />
+            <include name="deleteStudent_negative" />
+            <include name="deleteStudent_positive" />
+        </methods>
+      <class name="test.testFtpclient.TestFtpclient"/>
+            <methods>
+            <include name="connect" />
+            <include name="create_worker" />
+            <include name="updateFTP" />
+        </methods>
+    </classes>
+  </test>
+</suite>
+
+
