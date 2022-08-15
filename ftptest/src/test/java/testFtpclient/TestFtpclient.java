@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package testFtpclient;
 
 import com.mycompany.ftpclient.Ftpclient;
@@ -15,6 +11,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.net.ftp.FTPClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -102,6 +100,8 @@ public class TestFtpclient {
             Jsonworker worker3 = Ftpclient.createworker(client);
             Assert.assertEquals(worker3.get_all_Students().length,2);
         } catch (IOException ex) {
+            fail();
+        } catch (ParseException ex) {
             fail();
         }
     }
