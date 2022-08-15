@@ -7,6 +7,11 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 import com.mycompany.jsonworker.Jsonworker;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 /**
  *
  * @author misha
@@ -80,11 +85,15 @@ public class Ftpclient {
     }
 
     public static void connect(String[] args, FTPClient client) throws IOException {
-
+        client.connect(args[0], Integer.parseInt(args[3]));
+        client.login(args[1], args[2]);
     }
 
     public static Jsonworker createworker(FTPClient client) throws IOException, ParseException{
-        
+                InputStream loadinputStream = client.retrieveFileStream("students.json"); 
+        JSONParser jsonParser = new JSONParser();
+        return new Jsonworker((JSONObject) jsonParser.parse(
+                        new InputStreamReader(loadinputStream, "UTF-8")));
     }
     public static void print_instruction() {
         System.out.println("Print numbers in comand line according to the instruction below");
@@ -97,21 +106,45 @@ public class Ftpclient {
     }
 
     public static void print_all_students(Jsonworker worker) {
-
+        String[][] students = worker.get_all_Students();
+        for (Integer i = 0; i < students.length; i++) {
+            System.out.println("id=" + students[i][0] + ", name =" + students[i][1]);
+        }
     }
 
     public static void print_student(Jsonworker worker, Integer id) {
-
+        try {
+            System.out.println(worker.getStudentbyId(id));
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public static boolean add_student(Jsonworker worker, String name) {
-
+        try {
+            worker.addStudent(name);
+            System.out.println("Student added");
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
     }
 
     public static boolean delete_student(Jsonworker worker, Integer id) {
-
+        try {
+            worker.deleteStudent(id);
+            System.out.println("Student deleted"); 
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
     }
     
     public static void updateFTP(FTPClient client, String File) throws IOException{
-
+        client.deleteFile("students.json");
+        InputStream savestream = new ByteArrayInputStream(File.getBytes(StandardCharsets.UTF_8));;
+        client.storeFile("students.json", savestream);
+    }
 }
