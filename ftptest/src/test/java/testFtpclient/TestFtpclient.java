@@ -36,6 +36,7 @@ public class TestFtpclient {
         fakeFtpServer.setServerControlPort(0);
         FileSystem fileSystem = new UnixFakeFileSystem();
         DirectoryEntry directoryEntry = new DirectoryEntry("/");
+        directoryEntry.setPermissionsFromString("rwxrwxrwx");
         JSONObject students = new JSONObject();
         JSONArray arr = new JSONArray();
         JSONObject student = new JSONObject();
@@ -51,7 +52,7 @@ public class TestFtpclient {
         student.put("name", "aaabbbb");
         arr.add(student);
         students.put("students", arr);
-        FileEntry fileEntry = new FileEntry("/test.json", students.toString());
+        FileEntry fileEntry = new FileEntry("/students.json", students.toString());
         fileSystem.add(directoryEntry);
         fileSystem.add(fileEntry);
         fakeFtpServer.setFileSystem(fileSystem);
@@ -67,6 +68,7 @@ public class TestFtpclient {
             Ftpclient.connect(args, client);    
             Assert.assertEquals(fakeFtpServer.getSystemStatus(),"Connected");
         } catch (IOException ex) {
+            System.out.println("Connection failed");
             fail();
         }
     }
@@ -76,14 +78,16 @@ public class TestFtpclient {
             worker = Ftpclient.createworker(client);    
             Assert.assertEquals(worker.get_all_Students().length,3);
         } catch (IOException ex) {
+            System.out.println("IOException failure");
             fail();
         } catch (ParseException ex) {
+            System.out.println("ParseException failure");
             fail();
         }
     }
     @Test
     public void updateFTP()  {
-                try {
+        try {
             JSONObject students = new JSONObject();
             JSONArray arr = new JSONArray();
             JSONObject student = new JSONObject();
@@ -95,13 +99,11 @@ public class TestFtpclient {
             student.put("name", "bbbb");
             arr.add(student);
             students.put("students", arr);
-            Jsonworker worker2= new Jsonworker(students);
-            Ftpclient.updateFTP(client, worker2.getstudents().toString());
-            Jsonworker worker3 = Ftpclient.createworker(client);
-            Assert.assertEquals(worker3.get_all_Students().length,2);
+            Jsonworker worker2 = new Jsonworker(students);
+            if (!Ftpclient.updateFTP(client, worker2.getstudents().toString()))
+                fail();
         } catch (IOException ex) {
-            fail();
-        } catch (ParseException ex) {
+            System.out.println("IOException failure");
             fail();
         }
     }

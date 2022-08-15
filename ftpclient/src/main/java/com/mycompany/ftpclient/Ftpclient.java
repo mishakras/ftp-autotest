@@ -147,9 +147,12 @@ public class Ftpclient {
         }
     }
     
-    public static void updateFTP(FTPClient client, String File) throws IOException{
+    public static boolean updateFTP(FTPClient client, String File) throws IOException{
         client.deleteFile("students.json");
-        InputStream savestream = new ByteArrayInputStream(File.getBytes(StandardCharsets.UTF_8));;
-        client.storeFile("students.json", savestream);
+        boolean save_file;
+        try (InputStream savestream = new ByteArrayInputStream(File.getBytes(StandardCharsets.UTF_8))) {
+            save_file = client.storeFile("students.json", savestream);
+        }
+        return save_file;
     }
 }
